@@ -5,6 +5,7 @@ import { getApiKey, setApiKey } from "./lib/storage";
 import Upload from "./components/Upload";
 import ActiveJob from "./components/ActiveJob";
 import JobHistory from "./components/JobHistory";
+import SettingsModal from "./components/SettingsModal";
 
 export default function App() {
   const [apiKey, setApiKeyState] = useState(getApiKey);
@@ -15,11 +16,11 @@ export default function App() {
 
   const activeJob = activeJobId ? jobs[activeJobId] : null;
 
-  const handleSaveKey = useCallback(() => {
-    setApiKey(keyInput);
-    setApiKeyState(keyInput);
-    setShowSettings(false);
-  }, [keyInput]);
+  const handleSaveKey = useCallback((key: string) => {
+    setApiKey(key);
+    setApiKeyState(key);
+    setKeyInput(key);
+  }, []);
 
   const handleNewJob = useCallback(() => {
     setActiveJobId(null);
@@ -43,12 +44,12 @@ export default function App() {
               type="password"
               value={keyInput}
               onChange={(e) => setKeyInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && keyInput && handleSaveKey()}
+              onKeyDown={(e) => e.key === "Enter" && keyInput && handleSaveKey(keyInput)}
               placeholder="FAL API Key"
               className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors"
             />
             <button
-              onClick={handleSaveKey}
+              onClick={() => handleSaveKey(keyInput)}
               disabled={!keyInput}
               className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
             >
@@ -69,35 +70,20 @@ export default function App() {
           EzMoControl
         </div>
         <button
-          onClick={() => setShowSettings(!showSettings)}
+          onClick={() => setShowSettings(true)}
           className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
         >
           <Settings className="w-5 h-5 text-zinc-400" />
         </button>
       </header>
 
-      {/* Settings panel */}
-      {showSettings && (
-        <div className="border-b border-zinc-800 px-6 py-4 bg-zinc-900/50">
-          <div className="max-w-md space-y-3">
-            <label className="text-sm text-zinc-400">FAL API Key</label>
-            <div className="flex gap-2">
-              <input
-                type="password"
-                value={keyInput}
-                onChange={(e) => setKeyInput(e.target.value)}
-                className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors"
-              />
-              <button
-                onClick={handleSaveKey}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-medium transition-colors"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Settings modal */}
+      <SettingsModal
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        apiKey={apiKey}
+        onSaveKey={handleSaveKey}
+      />
 
       {/* Main content */}
       <div className="flex-1 flex min-h-0">
