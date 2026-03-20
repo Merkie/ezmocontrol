@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback } from "react";
 
 interface BeforeAfterSliderProps {
   beforeSrc: string;
@@ -13,17 +13,23 @@ export default function BeforeAfterSlider({
   beforeLabel = "Before",
   afterLabel = "After",
 }: BeforeAfterSliderProps) {
-  const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
+  const clipRef = useRef<HTMLDivElement>(null);
+  const lineRef = useRef<HTMLDivElement>(null);
+  const beforeLabelRef = useRef<HTMLDivElement>(null);
+  const afterLabelRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
   const updatePosition = useCallback((clientX: number) => {
     const container = containerRef.current;
     if (!container) return;
     const rect = container.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setPosition(pct);
+    const pct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+
+    if (clipRef.current) clipRef.current.style.width = `${pct}%`;
+    if (lineRef.current) lineRef.current.style.left = `${pct}%`;
+    if (beforeLabelRef.current) beforeLabelRef.current.style.opacity = pct > 10 ? "1" : "0";
+    if (afterLabelRef.current) afterLabelRef.current.style.opacity = pct < 90 ? "1" : "0";
   }, []);
 
   const handlePointerDown = useCallback(
@@ -65,22 +71,24 @@ export default function BeforeAfterSlider({
 
       {/* Before image (clipped, top layer) */}
       <div
+        ref={clipRef}
         className="absolute inset-0 overflow-hidden"
-        style={{ width: `${position}%` }}
+        style={{ width: "50%" }}
       >
         <img
           src={beforeSrc}
           alt={beforeLabel}
-          className="block w-full h-full object-cover object-left"
-          style={{ minWidth: containerRef.current?.offsetWidth ?? "100%" }}
+          className="block h-full object-cover object-left"
+          style={{ width: containerRef.current?.offsetWidth ?? "100%" }}
           draggable={false}
         />
       </div>
 
       {/* Divider line */}
       <div
+        ref={lineRef}
         className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.5)]"
-        style={{ left: `${position}%`, transform: "translateX(-50%)" }}
+        style={{ left: "50%", transform: "translateX(-50%)" }}
       >
         {/* Handle */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
@@ -104,16 +112,14 @@ export default function BeforeAfterSlider({
 
       {/* Labels */}
       <div
-        className={`absolute top-3 left-3 px-2 py-1 rounded text-xs font-medium bg-black/60 backdrop-blur-sm transition-opacity ${
-          position > 10 ? "opacity-100" : "opacity-0"
-        }`}
+        ref={beforeLabelRef}
+        className="absolute top-3 left-3 px-2 py-1 rounded text-xs font-medium bg-black/60 backdrop-blur-sm transition-opacity"
       >
         {beforeLabel}
       </div>
       <div
-        className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium bg-black/60 backdrop-blur-sm transition-opacity ${
-          position < 90 ? "opacity-100" : "opacity-0"
-        }`}
+        ref={afterLabelRef}
+        className="absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium bg-black/60 backdrop-blur-sm transition-opacity"
       >
         {afterLabel}
       </div>

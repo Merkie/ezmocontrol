@@ -17,7 +17,11 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
+let cachedCryptoKey: CryptoKey | null = null;
+
 async function getOrCreateCryptoKey(): Promise<CryptoKey> {
+  if (cachedCryptoKey) return cachedCryptoKey;
+
   const db = await openDB();
 
   const existing = await new Promise<CryptoKey | undefined>(
@@ -32,6 +36,7 @@ async function getOrCreateCryptoKey(): Promise<CryptoKey> {
 
   if (existing) {
     db.close();
+    cachedCryptoKey = existing;
     return existing;
   }
 
@@ -50,6 +55,7 @@ async function getOrCreateCryptoKey(): Promise<CryptoKey> {
   });
 
   db.close();
+  cachedCryptoKey = key;
   return key;
 }
 

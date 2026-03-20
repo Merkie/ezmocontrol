@@ -7,9 +7,45 @@ import ActiveJob from "./components/ActiveJob";
 import JobHistory from "./components/JobHistory";
 import SettingsModal from "./components/SettingsModal";
 
+function ApiKeyEntry({ onSave }: { onSave: (key: string) => void }) {
+  const [keyInput, setKeyInput] = useState("");
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 text-2xl font-bold">
+            <Zap className="w-7 h-7 text-blue-500" />
+            EzMoControl
+          </div>
+          <p className="text-zinc-400 text-sm">
+            Enter your FAL API key to get started
+          </p>
+        </div>
+        <div className="space-y-3">
+          <input
+            type="password"
+            value={keyInput}
+            onChange={(e) => setKeyInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && keyInput && onSave(keyInput)}
+            placeholder="FAL API Key"
+            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors"
+          />
+          <button
+            onClick={() => onSave(keyInput)}
+            disabled={!keyInput}
+            className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+          >
+            Save & Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [apiKey, setApiKeyState] = useState("");
-  const [keyInput, setKeyInput] = useState("");
   const [keyLoaded, setKeyLoaded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
@@ -20,7 +56,6 @@ export default function App() {
   useEffect(() => {
     getApiKey().then((key) => {
       setApiKeyState(key);
-      setKeyInput(key);
       setKeyLoaded(true);
     });
   }, []);
@@ -28,7 +63,6 @@ export default function App() {
   const handleSaveKey = useCallback(async (key: string) => {
     await setApiKey(key);
     setApiKeyState(key);
-    setKeyInput(key);
   }, []);
 
   const handleNewJob = useCallback(() => {
@@ -44,38 +78,7 @@ export default function App() {
   }
 
   if (!apiKey) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-6">
-          <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-2 text-2xl font-bold">
-              <Zap className="w-7 h-7 text-blue-500" />
-              EzMoControl
-            </div>
-            <p className="text-zinc-400 text-sm">
-              Enter your FAL API key to get started
-            </p>
-          </div>
-          <div className="space-y-3">
-            <input
-              type="password"
-              value={keyInput}
-              onChange={(e) => setKeyInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && keyInput && handleSaveKey(keyInput)}
-              placeholder="FAL API Key"
-              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors"
-            />
-            <button
-              onClick={() => handleSaveKey(keyInput)}
-              disabled={!keyInput}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
-            >
-              Save & Continue
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <ApiKeyEntry onSave={handleSaveKey} />;
   }
 
   return (

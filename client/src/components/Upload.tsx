@@ -11,26 +11,16 @@ interface Props {
   onJobCreated: (id: string) => void;
 }
 
-function getVideoDuration(file: File): Promise<number> {
+function getVideoMetadata(file: File): Promise<{ duration: number; dimensions: Dimensions }> {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
     video.preload = "metadata";
     video.onloadedmetadata = () => {
       URL.revokeObjectURL(video.src);
-      resolve(video.duration);
-    };
-    video.onerror = () => reject(new Error("Invalid video file"));
-    video.src = URL.createObjectURL(file);
-  });
-}
-
-function getVideoDimensions(file: File): Promise<Dimensions> {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(video.src);
-      resolve({ width: video.videoWidth, height: video.videoHeight });
+      resolve({
+        duration: video.duration,
+        dimensions: { width: video.videoWidth, height: video.videoHeight },
+      });
     };
     video.onerror = () => reject(new Error("Invalid video file"));
     video.src = URL.createObjectURL(file);
@@ -67,6 +57,7 @@ export default function Upload({
   const [imageDragOver, setImageDragOver] = useState(false);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoDimsRef = useRef<Dimensions | null>(null);
 
   const handleVideoSelect = useCallback(async (file: File) => {
     setVideoError(null);
@@ -75,17 +66,21 @@ export default function Upload({
       return;
     }
     try {
-      const duration = await getVideoDuration(file);
-      if (duration > 10) {
-        setVideoError(`Video is ${duration.toFixed(1)}s — must be 10s or less`);
+      const meta = await getVideoMetadata(file);
+      if (meta.duration > 10) {
+        setVideoError(`Video is ${meta.duration.toFixed(1)}s — must be 10s or less`);
         return;
       }
+      videoDimsRef.current = meta.dimensions;
     } catch {
       setVideoError("Could not read video file");
       return;
     }
     setVideoFile(file);
-    setVideoPreviewUrl(URL.createObjectURL(file));
+    setVideoPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   }, []);
 
   const handleCharacterSelect = useCallback((file: File) => {
@@ -93,7 +88,10 @@ export default function Upload({
       return;
     }
     setCharacterFile(file);
-    setCharacterPreviewUrl(URL.createObjectURL(file));
+    setCharacterPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(file);
+    });
   }, []);
 
   const handleDrop = useCallback(
@@ -114,7 +112,7 @@ export default function Upload({
 
     try {
       const [frameDimensions, characterDimensions] = await Promise.all([
-        getVideoDimensions(videoFile),
+        videoDimsRef.current ? Promise.resolve(videoDimsRef.current) : getVideoMetadata(videoFile).then((m) => m.dimensions),
         getImageDimensions(characterFile),
       ]);
 
@@ -224,8 +222,9 @@ export default function Upload({
                   onClick={(e) => {
                     e.stopPropagation();
                     setVideoFile(null);
-                    setVideoPreviewUrl(null);
+                    setVideoPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
                     setVideoError(null);
+                    videoDimsRef.current = null;
                   }}
                   className="absolute top-2 right-2 p-1 bg-zinc-800 rounded-md hover:bg-zinc-700"
                 >
@@ -293,7 +292,7 @@ export default function Upload({
                   onClick={(e) => {
                     e.stopPropagation();
                     setCharacterFile(null);
-                    setCharacterPreviewUrl(null);
+                    setCharacterPreviewUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
                   }}
                   className="absolute top-2 right-2 p-1 bg-zinc-800 rounded-md hover:bg-zinc-700"
                 >

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import type { Job } from "../types";
 import { getJobs, saveJobs } from "../lib/storage";
 
@@ -37,8 +37,11 @@ export function useJobs() {
     });
   }, []);
 
-  const sortedJobs = Object.values(jobs).sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const sortedJobs = useMemo(
+    () => Object.values(jobs).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ),
+    [jobs]
   );
 
   return { jobs, sortedJobs, createJob, updateJob, deleteJob };

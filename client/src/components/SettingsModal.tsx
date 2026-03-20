@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Key, ExternalLink } from "lucide-react";
 import Modal from "./Modal";
 
@@ -17,6 +17,10 @@ export default function SettingsModal({
 }: SettingsModalProps) {
   const [keyInput, setKeyInput] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
+
+  useEffect(() => {
+    if (open) setKeyInput(apiKey);
+  }, [open, apiKey]);
 
   const handleSave = async () => {
     await onSaveKey(keyInput);

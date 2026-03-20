@@ -15,11 +15,17 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
   useEffect(() => {
     if (src) {
       setRenderedSrc(src);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+      const raf1 = requestAnimationFrame(() => {
+        const raf2 = requestAnimationFrame(() => {
           setIsVisible(true);
         });
+        (cleanup as any).raf2 = raf2;
       });
+      const cleanup = { raf2: 0 };
+      return () => {
+        cancelAnimationFrame(raf1);
+        cancelAnimationFrame(cleanup.raf2);
+      };
     } else {
       setIsVisible(false);
       const timer = setTimeout(() => {
@@ -37,13 +43,6 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [src, onClose]);
-
-  const handleBackdrop = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.target === e.currentTarget) onClose();
-    },
-    [onClose]
-  );
 
   const handleDownload = useCallback(async () => {
     if (!renderedSrc) return;
@@ -68,7 +67,7 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-[300] flex items-center justify-center transition-opacity duration-200 ${
+      className={`fixed inset-0 z-[300] flex items-center justify-center ${
         isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       style={{
@@ -76,7 +75,9 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
           ? "opacity 200ms, visibility 0s"
           : "opacity 200ms, visibility 0s 200ms",
       }}
-      onClick={handleBackdrop}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
