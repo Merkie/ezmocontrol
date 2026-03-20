@@ -13,6 +13,9 @@ import {
 import type { Job } from "../types";
 import { IMAGE_MODELS, POLL_INTERVAL_IMAGE, POLL_INTERVAL_VIDEO } from "../lib/constants";
 import * as api from "../lib/api";
+import { ConfirmModal } from "./Modal";
+import BeforeAfterSlider from "./BeforeAfterSlider";
+import ImageLightbox from "./ImageLightbox";
 
 interface Props {
   job: Job;
@@ -37,6 +40,8 @@ function getStepIndex(status: string): number {
 
 export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
   const [regenModel, setRegenModel] = useState(job.selectedModel);
+  const [showRegenConfirm, setShowRegenConfirm] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   // Poll image generation status
   const imageStatus = useQuery({
@@ -276,31 +281,15 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
           </div>
         )}
 
-        {/* Awaiting approval */}
+        {/* Awaiting approval - Before/After slider */}
         {job.status === "awaiting_approval" && job.generatedImageUrl && (
           <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">
-                  Original Frame
-                </p>
-                <img
-                  src={job.frameUrl}
-                  alt="Original frame"
-                  className="w-full rounded-lg border border-zinc-800"
-                />
-              </div>
-              <div className="space-y-2">
-                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">
-                  Generated Image
-                </p>
-                <img
-                  src={job.generatedImageUrl}
-                  alt="Generated"
-                  className="w-full rounded-lg border border-zinc-800"
-                />
-              </div>
-            </div>
+            <BeforeAfterSlider
+              beforeSrc={job.frameUrl!}
+              afterSrc={job.generatedImageUrl}
+              beforeLabel="Original Frame"
+              afterLabel="Generated Image"
+            />
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -322,7 +311,7 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
 
               <div className="flex gap-3">
                 <button
-                  onClick={handleRegenerate}
+                  onClick={() => setShowRegenConfirm(true)}
                   className="flex-1 py-3 border border-zinc-700 hover:border-zinc-600 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -369,7 +358,8 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
                 <img
                   src={job.generatedImageUrl}
                   alt="Approved"
-                  className="max-h-48 rounded-lg border border-zinc-800"
+                  className="max-h-48 rounded-lg border border-zinc-800 cursor-pointer transition-transform hover:scale-[1.02]"
+                  onClick={() => setLightboxSrc(job.generatedImageUrl!)}
                 />
               </div>
             )}
@@ -420,6 +410,23 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
           </div>
         )}
       </div>
+
+      {/* Regenerate confirmation modal */}
+      <ConfirmModal
+        open={showRegenConfirm}
+        onClose={() => setShowRegenConfirm(false)}
+        onConfirm={handleRegenerate}
+        title="Regenerate Image?"
+        message="This will discard the current generated image and create a new one. The image generation will use credits from your FAL account."
+        confirmLabel="Regenerate"
+        cancelLabel="Keep Current"
+      />
+
+      {/* Image lightbox for full-screen viewing */}
+      <ImageLightbox
+        src={lightboxSrc}
+        onClose={() => setLightboxSrc(null)}
+      />
     </div>
   );
 }
