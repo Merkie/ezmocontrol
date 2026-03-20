@@ -65,10 +65,13 @@ export default function App() {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="border-b border-zinc-800 px-6 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 font-bold text-lg">
+        <button
+          onClick={handleNewJob}
+          className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition-opacity"
+        >
           <Zap className="w-5 h-5 text-blue-500" />
           EzMoControl
-        </div>
+        </button>
         <button
           onClick={() => setShowSettings(true)}
           className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"

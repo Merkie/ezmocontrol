@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Download,
   AlertCircle,
+  AlertTriangle,
   Clock,
 } from "lucide-react";
 import type { Job } from "../types";
@@ -207,12 +208,14 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
       </div>
 
       {/* Step indicator */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center">
         {STEPS.map((step, i) => (
           <div key={step.key} className="flex items-center flex-1 last:flex-none">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 shrink-0">
               {i < currentStep || job.status === "complete" ? (
                 <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
+              ) : i === currentStep && job.status === "awaiting_approval" ? (
+                <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0" />
               ) : i === currentStep && job.status !== "failed" ? (
                 <Loader2 className="w-4 h-4 text-blue-500 animate-spin shrink-0" />
               ) : job.status === "failed" && i === currentStep ? (
@@ -222,11 +225,13 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
               )}
               <span
                 className={`text-xs whitespace-nowrap ${
-                  i <= currentStep
-                    ? job.status === "failed" && i === currentStep
-                      ? "text-red-400"
-                      : "text-zinc-300"
-                    : "text-zinc-600"
+                  i === currentStep && job.status === "awaiting_approval"
+                    ? "text-yellow-400"
+                    : i <= currentStep
+                      ? job.status === "failed" && i === currentStep
+                        ? "text-red-400"
+                        : "text-zinc-300"
+                      : "text-zinc-600"
                 }`}
               >
                 {step.label}
