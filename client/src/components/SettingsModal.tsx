@@ -6,7 +6,7 @@ interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
   apiKey: string;
-  onSaveKey: (key: string) => void;
+  onSaveKey: (key: string) => void | Promise<void>;
 }
 
 export default function SettingsModal({
@@ -18,8 +18,8 @@ export default function SettingsModal({
   const [keyInput, setKeyInput] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
 
-  const handleSave = () => {
-    onSaveKey(keyInput);
+  const handleSave = async () => {
+    await onSaveKey(keyInput);
     onClose();
   };
 

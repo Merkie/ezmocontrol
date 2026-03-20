@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Settings, Zap } from "lucide-react";
 import { useJobs } from "./hooks/useJobs";
 import { getApiKey, setApiKey } from "./lib/storage";
@@ -8,16 +8,25 @@ import JobHistory from "./components/JobHistory";
 import SettingsModal from "./components/SettingsModal";
 
 export default function App() {
-  const [apiKey, setApiKeyState] = useState(getApiKey);
-  const [keyInput, setKeyInput] = useState(apiKey);
+  const [apiKey, setApiKeyState] = useState("");
+  const [keyInput, setKeyInput] = useState("");
+  const [keyLoaded, setKeyLoaded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [activeJobId, setActiveJobId] = useState<string | null>(null);
   const { jobs, sortedJobs, createJob, updateJob, deleteJob } = useJobs();
 
   const activeJob = activeJobId ? jobs[activeJobId] : null;
 
-  const handleSaveKey = useCallback((key: string) => {
-    setApiKey(key);
+  useEffect(() => {
+    getApiKey().then((key) => {
+      setApiKeyState(key);
+      setKeyInput(key);
+      setKeyLoaded(true);
+    });
+  }, []);
+
+  const handleSaveKey = useCallback(async (key: string) => {
+    await setApiKey(key);
     setApiKeyState(key);
     setKeyInput(key);
   }, []);
@@ -25,6 +34,14 @@ export default function App() {
   const handleNewJob = useCallback(() => {
     setActiveJobId(null);
   }, []);
+
+  if (!keyLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-zinc-400 text-sm">Loading...</div>
+      </div>
+    );
+  }
 
   if (!apiKey) {
     return (
