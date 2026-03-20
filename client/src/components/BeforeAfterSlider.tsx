@@ -56,7 +56,7 @@ export default function BeforeAfterSlider({
   return (
     <div
       ref={containerRef}
-      className="relative w-full select-none overflow-hidden rounded-lg border border-zinc-800 cursor-col-resize"
+      className="relative w-full select-none overflow-hidden rounded border border-edge cursor-col-resize"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -87,17 +87,17 @@ export default function BeforeAfterSlider({
       {/* Divider line */}
       <div
         ref={lineRef}
-        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+        className="absolute top-0 bottom-0 w-0.5 bg-neon shadow-[0_0_12px_rgba(0,255,136,0.5)]"
         style={{ left: "50%", transform: "translateX(-50%)" }}
       >
         {/* Handle */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-neon rounded-full shadow-[0_0_12px_rgba(0,255,136,0.5)] flex items-center justify-center">
           <svg
             width="16"
             height="16"
             viewBox="0 0 16 16"
             fill="none"
-            className="text-zinc-800"
+            className="text-void"
           >
             <path
               d="M5 3L2 8L5 13M11 3L14 8L11 13"
@@ -113,13 +113,13 @@ export default function BeforeAfterSlider({
       {/* Labels */}
       <div
         ref={beforeLabelRef}
-        className="absolute top-3 left-3 px-2 py-1 rounded text-xs font-medium bg-black/60 backdrop-blur-sm transition-opacity"
+        className="absolute top-3 left-3 px-2 py-1 rounded text-[10px] uppercase tracking-wider font-medium bg-void/70 backdrop-blur-sm transition-opacity"
       >
         {beforeLabel}
       </div>
       <div
         ref={afterLabelRef}
-        className="absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium bg-black/60 backdrop-blur-sm transition-opacity"
+        className="absolute top-3 right-3 px-2 py-1 rounded text-[10px] uppercase tracking-wider font-medium bg-void/70 backdrop-blur-sm transition-opacity"
       >
         {afterLabel}
       </div>

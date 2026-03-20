@@ -22,7 +22,6 @@ export default function Modal({ open, onClose, title, size = "md", children }: M
         const raf2 = requestAnimationFrame(() => {
           setIsVisible(true);
         });
-        // Store raf2 for cleanup via closure — cancelled by outer cleanup
         (cleanup as any).raf2 = raf2;
       });
       const cleanup = { raf2: 0 };
@@ -62,11 +61,11 @@ export default function Modal({ open, onClose, title, size = "md", children }: M
       }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
-        className={`relative w-full ${sizeClass} overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-900 shadow-2xl transition-[opacity,transform] duration-200 ${
+        className={`relative w-full ${sizeClass} overflow-hidden rounded border border-edge bg-panel shadow-2xl transition-[opacity,transform] duration-200 ${
           isVisible
             ? "translate-y-0 opacity-100"
             : "translate-y-[5px] opacity-0"
@@ -74,11 +73,11 @@ export default function Modal({ open, onClose, title, size = "md", children }: M
       >
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
-            <h2 className="text-base font-semibold">{title}</h2>
+          <div className="flex items-center justify-between border-b border-edge px-5 py-4">
+            <h2 className="text-sm font-display font-semibold uppercase tracking-wide">{title}</h2>
             <button
               onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+              className="flex h-7 w-7 items-center justify-center rounded text-dim transition-all hover:text-neon"
             >
               <X className="w-4 h-4" />
             </button>
@@ -118,11 +117,11 @@ export function ConfirmModal({
   return (
     <Modal open={open} onClose={onClose} title={title} size="sm">
       <div className="space-y-5">
-        <p className="text-sm text-zinc-400">{message}</p>
+        <p className="text-sm text-dim">{message}</p>
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 border border-zinc-700 hover:border-zinc-600 rounded-lg text-sm font-medium transition-colors"
+            className="flex-1 py-2.5 border border-edge hover:border-haze rounded text-sm font-medium transition-all"
           >
             {cancelLabel}
           </button>
@@ -131,10 +130,10 @@ export function ConfirmModal({
               onConfirm();
               onClose();
             }}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex-1 py-2.5 rounded text-sm font-bold uppercase tracking-wider transition-all ${
               variant === "danger"
-                ? "bg-red-600 hover:bg-red-500"
-                : "bg-blue-600 hover:bg-blue-500"
+                ? "bg-danger text-white hover:brightness-110"
+                : "bg-neon text-void hover:brightness-110"
             }`}
           >
             {confirmLabel}

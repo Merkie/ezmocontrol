@@ -19,13 +19,13 @@ interface Props {
 function StatusIcon({ status }: { status: JobStatus }) {
   switch (status) {
     case "complete":
-      return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
+      return <CheckCircle className="w-3.5 h-3.5 text-neon" />;
     case "failed":
-      return <AlertCircle className="w-3.5 h-3.5 text-red-500" />;
+      return <AlertCircle className="w-3.5 h-3.5 text-danger" />;
     case "awaiting_approval":
-      return <Clock className="w-3.5 h-3.5 text-yellow-500" />;
+      return <Clock className="w-3.5 h-3.5 text-amber-400" />;
     default:
-      return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" />;
+      return <Loader2 className="w-3.5 h-3.5 text-cyan animate-spin" />;
   }
 }
 
@@ -51,25 +51,27 @@ function statusLabel(status: JobStatus): string {
 export default function JobHistory({ jobs, activeJobId, onSelect, onDelete }: Props) {
   if (jobs.length === 0) {
     return (
-      <div className="p-4 text-center text-zinc-600 text-sm">
+      <div className="p-4 text-center text-dim/50 text-sm">
         No jobs yet
       </div>
     );
   }
 
   return (
-    <div className="divide-y divide-zinc-800/50">
+    <div className="divide-y divide-edge/50">
       {jobs.map((job) => (
         <button
           key={job.id}
           onClick={() => onSelect(job.id)}
-          className={`w-full p-3 text-left hover:bg-zinc-800/50 transition-colors group ${
-            activeJobId === job.id ? "bg-zinc-800/70" : ""
+          className={`w-full p-3 text-left transition-all group ${
+            activeJobId === job.id
+              ? "bg-elevated/60 border-l-2 border-l-neon"
+              : "hover:bg-elevated/30 border-l-2 border-l-transparent"
           }`}
         >
           <div className="flex items-start gap-2.5">
             {/* Thumbnail */}
-            <div className="w-10 h-10 rounded-md bg-zinc-800 flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-10 h-10 rounded bg-elevated flex items-center justify-center shrink-0 overflow-hidden">
               {job.generatedImageUrl ? (
                 <img
                   src={job.generatedImageUrl}
@@ -77,20 +79,20 @@ export default function JobHistory({ jobs, activeJobId, onSelect, onDelete }: Pr
                   className="w-full h-full object-cover"
                 />
               ) : job.finalVideoUrl ? (
-                <Video className="w-4 h-4 text-zinc-500" />
+                <Video className="w-4 h-4 text-dim" />
               ) : (
-                <Image className="w-4 h-4 text-zinc-600" />
+                <Image className="w-4 h-4 text-dim/50" />
               )}
             </div>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <StatusIcon status={job.status} />
-                <span className="text-xs text-zinc-400">
+                <span className="text-xs text-dim">
                   {statusLabel(job.status)}
                 </span>
               </div>
-              <p className="text-[10px] text-zinc-600 mt-0.5 font-mono">
+              <p className="text-[10px] text-dim/50 mt-0.5 font-mono">
                 {new Date(job.createdAt).toLocaleDateString()}{" "}
                 {new Date(job.createdAt).toLocaleTimeString([], {
                   hour: "2-digit",
@@ -105,9 +107,9 @@ export default function JobHistory({ jobs, activeJobId, onSelect, onDelete }: Pr
                 e.stopPropagation();
                 onDelete(job.id);
               }}
-              className="p-1 opacity-0 group-hover:opacity-100 hover:bg-zinc-700 rounded transition-all"
+              className="p-1 opacity-0 group-hover:opacity-100 hover:text-danger rounded transition-all"
             >
-              <Trash2 className="w-3 h-3 text-zinc-500" />
+              <Trash2 className="w-3 h-3" />
             </button>
           </div>
         </button>

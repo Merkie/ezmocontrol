@@ -27,10 +27,10 @@ interface Props {
 
 const STEPS = [
   { key: "uploading", label: "Upload" },
-  { key: "extracting_frame", label: "Extract Frame" },
-  { key: "generating_image", label: "Generate Image" },
+  { key: "extracting_frame", label: "Extract" },
+  { key: "generating_image", label: "Image Gen" },
   { key: "awaiting_approval", label: "Review" },
-  { key: "generating_video", label: "Generate Video" },
+  { key: "generating_video", label: "Video Gen" },
   { key: "complete", label: "Done" },
 ] as const;
 
@@ -197,13 +197,13 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
       <div className="flex items-center gap-3">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+          className="p-2 text-dim hover:text-neon hover:bg-neon/5 rounded transition-all"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <div>
-          <h2 className="text-xl font-semibold">Job</h2>
-          <p className="text-xs text-zinc-500 font-mono">{job.id.slice(0, 8)}</p>
+          <h2 className="text-lg font-display font-semibold uppercase tracking-wide">Job</h2>
+          <p className="text-[10px] text-dim font-mono tracking-wider">{job.id.slice(0, 8)}</p>
         </div>
       </div>
 
@@ -213,25 +213,25 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
           <div key={step.key} className="flex items-center flex-1 last:flex-none">
             <div className="flex items-center gap-1.5 shrink-0">
               {i < currentStep || job.status === "complete" ? (
-                <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
+                <CheckCircle className="w-4 h-4 text-neon shrink-0" />
               ) : i === currentStep && job.status === "awaiting_approval" ? (
-                <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0" />
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
               ) : i === currentStep && job.status !== "failed" ? (
-                <Loader2 className="w-4 h-4 text-blue-500 animate-spin shrink-0" />
+                <Loader2 className="w-4 h-4 text-cyan animate-spin shrink-0" />
               ) : job.status === "failed" && i === currentStep ? (
-                <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-danger shrink-0" />
               ) : (
-                <Circle className="w-4 h-4 text-zinc-700 shrink-0" />
+                <Circle className="w-4 h-4 text-edge shrink-0" />
               )}
               <span
-                className={`text-xs whitespace-nowrap ${
+                className={`text-[11px] uppercase tracking-wider whitespace-nowrap ${
                   i === currentStep && job.status === "awaiting_approval"
-                    ? "text-yellow-400"
+                    ? "text-amber-400"
                     : i <= currentStep
                       ? job.status === "failed" && i === currentStep
-                        ? "text-red-400"
-                        : "text-zinc-300"
-                      : "text-zinc-600"
+                        ? "text-danger"
+                        : "text-haze"
+                      : "text-dim/50"
                 }`}
               >
                 {step.label}
@@ -240,7 +240,7 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
             {i < STEPS.length - 1 && (
               <div
                 className={`flex-1 h-px mx-2 ${
-                  i < currentStep ? "bg-green-500/50" : "bg-zinc-800"
+                  i < currentStep ? "bg-neon/30" : "bg-edge"
                 }`}
               />
             )}
@@ -253,9 +253,9 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
         {/* Loading states */}
         {(job.status === "uploading" ||
           job.status === "extracting_frame") && (
-          <div className="flex flex-col items-center gap-4 py-12">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-            <p className="text-zinc-400">
+          <div className="flex flex-col items-center gap-4 py-16">
+            <Loader2 className="w-8 h-8 text-cyan animate-spin" />
+            <p className="text-dim text-sm tracking-wide">
               {job.status === "uploading"
                 ? "Uploading files to FAL..."
                 : "Extracting first frame..."}
@@ -265,19 +265,20 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
 
         {/* Generating image */}
         {job.status === "generating_image" && (
-          <div className="flex flex-col items-center gap-4 py-12">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-            <p className="text-zinc-400">Generating character swap image...</p>
+          <div className="flex flex-col items-center gap-4 py-16">
+            <Loader2 className="w-8 h-8 text-cyan animate-spin" />
+            <p className="text-dim text-sm tracking-wide">Generating character swap...</p>
             {queuePosition != null && queuePosition > 0 && (
-              <p className="text-xs text-zinc-600 flex items-center gap-1">
+              <p className="text-[11px] text-dim/70 flex items-center gap-1.5">
                 <Clock className="w-3 h-3" />
                 Queue position: {queuePosition}
               </p>
             )}
             {currentLogs && currentLogs.length > 0 && (
-              <div className="w-full max-w-md mt-4 p-3 bg-zinc-900 rounded-lg border border-zinc-800 max-h-32 overflow-y-auto">
+              <div className="w-full max-w-md mt-4 p-3 bg-void border border-edge rounded max-h-32 overflow-y-auto">
                 {currentLogs.map((log, i) => (
-                  <p key={i} className="text-xs text-zinc-500 font-mono">
+                  <p key={i} className="text-[11px] text-dim font-mono">
+                    <span className="text-neon/50 mr-1">&gt;</span>
                     {log.message}
                   </p>
                 ))}
@@ -293,18 +294,18 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
               beforeSrc={job.frameUrl!}
               afterSrc={job.generatedImageUrl}
               beforeLabel="Original Frame"
-              afterLabel="Generated Image"
+              afterLabel="Generated"
             />
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <label className="text-sm text-zinc-400 shrink-0">
-                  Model for regeneration:
+                <label className="text-xs text-dim uppercase tracking-wider shrink-0">
+                  Model:
                 </label>
                 <select
                   value={regenModel}
                   onChange={(e) => setRegenModel(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+                  className="flex-1 px-3 py-2 bg-panel border border-edge rounded text-sm focus:outline-none focus:border-neon transition-all"
                 >
                   {IMAGE_MODELS.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -317,14 +318,14 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowRegenConfirm(true)}
-                  className="flex-1 py-3 border border-zinc-700 hover:border-zinc-600 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-3 border border-edge text-haze hover:border-magenta hover:text-magenta rounded text-sm font-medium uppercase tracking-wider transition-all flex items-center justify-center gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Regenerate
                 </button>
                 <button
                   onClick={handleApprove}
-                  className="flex-1 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-neon text-void rounded text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="w-4 h-4" />
                   Approve & Generate Video
@@ -336,22 +337,23 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
 
         {/* Generating video */}
         {job.status === "generating_video" && (
-          <div className="flex flex-col items-center gap-4 py-12">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-            <p className="text-zinc-400">Generating motion control video...</p>
-            <p className="text-xs text-zinc-600">
-              This can take 5-15 minutes. You can close this page and come back later.
+          <div className="flex flex-col items-center gap-4 py-16">
+            <Loader2 className="w-8 h-8 text-cyan animate-spin" />
+            <p className="text-dim text-sm tracking-wide">Generating video...</p>
+            <p className="text-[11px] text-dim/60">
+              This may take 5–15 min. Feel free to close this page.
             </p>
             {queuePosition != null && queuePosition > 0 && (
-              <p className="text-xs text-zinc-600 flex items-center gap-1">
+              <p className="text-[11px] text-dim/70 flex items-center gap-1.5">
                 <Clock className="w-3 h-3" />
                 Queue position: {queuePosition}
               </p>
             )}
             {currentLogs && currentLogs.length > 0 && (
-              <div className="w-full max-w-md mt-4 p-3 bg-zinc-900 rounded-lg border border-zinc-800 max-h-32 overflow-y-auto">
+              <div className="w-full max-w-md mt-4 p-3 bg-void border border-edge rounded max-h-32 overflow-y-auto">
                 {currentLogs.map((log, i) => (
-                  <p key={i} className="text-xs text-zinc-500 font-mono">
+                  <p key={i} className="text-[11px] text-dim font-mono">
+                    <span className="text-neon/50 mr-1">&gt;</span>
                     {log.message}
                   </p>
                 ))}
@@ -359,11 +361,11 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
             )}
             {job.generatedImageUrl && (
               <div className="mt-4">
-                <p className="text-xs text-zinc-500 mb-2 text-center">Approved image:</p>
+                <p className="text-[11px] text-dim mb-2 text-center uppercase tracking-wider">Approved image</p>
                 <img
                   src={job.generatedImageUrl}
                   alt="Approved"
-                  className="max-h-48 rounded-lg border border-zinc-800 cursor-pointer transition-transform hover:scale-[1.02]"
+                  className="max-h-48 rounded border border-edge cursor-pointer transition-all hover:border-neon/50 hover:glow-neon"
                   onClick={() => setLightboxSrc(job.generatedImageUrl!)}
                 />
               </div>
@@ -375,41 +377,41 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
         {job.status === "complete" && job.finalVideoUrl && (
           <div className="space-y-6">
             <div className="flex flex-col items-center gap-3">
-              <CheckCircle className="w-10 h-10 text-green-500" />
-              <p className="text-lg font-medium">Video Complete!</p>
+              <CheckCircle className="w-10 h-10 text-neon" style={{ filter: "drop-shadow(0 0 12px rgba(0, 255, 136, 0.5))" }} />
+              <p className="text-lg font-display font-semibold uppercase tracking-wide">Video Complete</p>
             </div>
             <video
               src={job.finalVideoUrl}
               controls
-              className="w-full rounded-lg border border-zinc-800"
+              className="w-full rounded border border-edge"
             />
             <a
               href={job.finalVideoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 bg-neon text-void rounded text-sm font-bold uppercase tracking-wider hover:brightness-110 transition-all flex items-center justify-center gap-2"
             >
               <Download className="w-4 h-4" />
-              Download Video
+              Download
             </a>
           </div>
         )}
 
         {/* Failed */}
         {job.status === "failed" && (
-          <div className="flex flex-col items-center gap-4 py-12">
-            <AlertCircle className="w-10 h-10 text-red-500" />
-            <p className="text-red-400">Job failed</p>
-            <p className="text-sm text-zinc-500 text-center max-w-md">
+          <div className="flex flex-col items-center gap-4 py-16">
+            <AlertCircle className="w-10 h-10 text-danger" style={{ filter: "drop-shadow(0 0 10px rgba(255, 51, 102, 0.4))" }} />
+            <p className="text-danger font-medium uppercase tracking-wide">Job Failed</p>
+            <p className="text-sm text-dim text-center max-w-md">
               {job.error || "An unknown error occurred"}
             </p>
             {job.frameUrl && job.characterImageUrl && (
               <button
                 onClick={handleRegenerate}
-                className="px-6 py-2 border border-zinc-700 hover:border-zinc-600 rounded-lg text-sm transition-colors flex items-center gap-2"
+                className="px-6 py-2.5 border border-edge hover:border-neon text-sm text-dim hover:text-neon rounded uppercase tracking-wider transition-all flex items-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
-                Retry Image Generation
+                Retry
               </button>
             )}
           </div>

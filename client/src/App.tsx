@@ -12,31 +12,34 @@ function ApiKeyEntry({ onSave }: { onSave: (key: string) => void }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 text-2xl font-bold">
-            <Zap className="w-7 h-7 text-blue-500" />
-            EzMoControl
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center space-y-3">
+          <div className="flex items-center justify-center gap-3 text-3xl font-display font-bold uppercase tracking-wider">
+            <Zap className="w-8 h-8 text-neon" style={{ filter: "drop-shadow(0 0 8px rgba(0, 255, 136, 0.6))" }} />
+            <span className="glitch-text">EzMoControl</span>
           </div>
-          <p className="text-zinc-400 text-sm">
-            Enter your FAL API key to get started
+          <p className="text-dim text-sm tracking-wide">
+            Authenticate with your FAL API key to get started
           </p>
         </div>
-        <div className="space-y-3">
-          <input
-            type="password"
-            value={keyInput}
-            onChange={(e) => setKeyInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && keyInput && onSave(keyInput)}
-            placeholder="FAL API Key"
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors"
-          />
+        <div className="space-y-4">
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neon text-sm">&gt;</span>
+            <input
+              type="password"
+              value={keyInput}
+              onChange={(e) => setKeyInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && keyInput && onSave(keyInput)}
+              placeholder="fal_api_key..."
+              className="w-full pl-8 pr-4 py-3 bg-panel border border-edge rounded text-sm tracking-wide text-neon focus:outline-none focus:border-neon focus:glow-neon transition-all placeholder:text-dim"
+            />
+          </div>
           <button
             onClick={() => onSave(keyInput)}
             disabled={!keyInput}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
+            className="w-full py-3 bg-neon text-void font-bold text-sm uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed rounded hover:brightness-110 transition-all"
           >
-            Save & Continue
+            Initialize
           </button>
         </div>
       </div>
@@ -72,7 +75,7 @@ export default function App() {
   if (!keyLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-zinc-400 text-sm">Loading...</div>
+        <span className="text-dim text-sm tracking-wide blink-cursor">Loading</span>
       </div>
     );
   }
@@ -84,19 +87,19 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-3 flex items-center justify-between shrink-0">
+      <header className="border-b border-edge px-6 py-3 flex items-center justify-between shrink-0 bg-panel/50 backdrop-blur-sm">
         <button
           onClick={handleNewJob}
-          className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 font-display font-bold text-lg uppercase tracking-wider hover:neon-text transition-all"
         >
-          <Zap className="w-5 h-5 text-blue-500" />
+          <Zap className="w-5 h-5 text-neon" style={{ filter: "drop-shadow(0 0 6px rgba(0, 255, 136, 0.5))" }} />
           EzMoControl
         </button>
         <button
           onClick={() => setShowSettings(true)}
-          className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+          className="p-2 text-dim hover:text-neon hover:glow-neon rounded transition-all"
         >
-          <Settings className="w-5 h-5 text-zinc-400" />
+          <Settings className="w-5 h-5" />
         </button>
       </header>
 
@@ -111,12 +114,12 @@ export default function App() {
       {/* Main content */}
       <div className="flex-1 flex min-h-0">
         {/* Sidebar - Job History */}
-        <aside className="w-64 border-r border-zinc-800 flex flex-col shrink-0">
-          <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-            <span className="text-sm font-medium text-zinc-300">Jobs</span>
+        <aside className="w-64 border-r border-edge flex flex-col shrink-0 bg-panel/40">
+          <div className="p-4 border-b border-edge flex items-center justify-between">
+            <span className="text-xs uppercase tracking-[0.2em] text-dim">Jobs</span>
             <button
               onClick={handleNewJob}
-              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-500 rounded-md transition-colors font-medium"
+              className="px-3 py-1 text-xs border border-neon/50 text-neon hover:bg-neon/10 hover:glow-neon rounded uppercase tracking-wider transition-all"
             >
               + New
             </button>

@@ -80,7 +80,7 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
       }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/85 backdrop-blur-md" />
 
       {/* Image */}
       <div
@@ -91,7 +91,7 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
         <img
           src={renderedSrc}
           alt="Enlarged view"
-          className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+          className="max-h-[90vh] max-w-[90vw] rounded border border-edge/50 object-contain shadow-2xl"
         />
       </div>
 
@@ -103,14 +103,14 @@ export default function ImageLightbox({ src, onClose }: ImageLightboxProps) {
       >
         <button
           onClick={handleDownload}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-elevated/80 border border-edge text-haze transition-all hover:text-neon hover:glow-neon"
           aria-label="Download"
         >
           <Download className="w-5 h-5" />
         </button>
         <button
           onClick={onClose}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-elevated/80 border border-edge text-haze transition-all hover:text-neon hover:glow-neon"
           aria-label="Close"
         >
           <X className="w-5 h-5" />

@@ -1,16 +1,91 @@
 @import "tailwindcss";
 
+@theme {
+  --color-void: #0a0a0f;
+  --color-panel: #12121a;
+  --color-elevated: #1c1c2e;
+  --color-neon: #00ff88;
+  --color-magenta: #ff00ff;
+  --color-cyan: #00d4ff;
+  --color-edge: #2a2a3a;
+  --color-dim: #6b7280;
+  --color-danger: #ff3366;
+  --color-haze: #e0e0e0;
+  --font-family-display: "Orbitron", "Share Tech Mono", monospace;
+  --font-family-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
 body {
-  background-color: #09090b;
-  color: #fafafa;
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 255, 136, 0.03) 0%, transparent 60%),
+    #0a0a0f;
+  color: #e0e0e0;
+  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+}
+
+/* Subtle circuit grid */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0, 255, 136, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.025) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #27272a transparent;
+  scrollbar-color: #2a2a3a transparent;
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────── */
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@keyframes glitch {
+  0%, 92%, 100% { transform: translate(0); text-shadow: none; }
+  93% { transform: translate(-2px, 1px); text-shadow: -2px 0 #ff00ff, 2px 0 #00d4ff; }
+  95% { transform: translate(1px, -1px); text-shadow: 2px 0 #ff00ff, -2px 0 #00d4ff; }
+  97% { transform: translate(-1px, 0); text-shadow: -1px 0 #ff00ff, 1px 0 #00d4ff; }
+}
+
+/* ─── Tailwind Utilities ──────────────────────────────────────────────── */
+
+@utility glow-neon {
+  box-shadow: 0 0 5px #00ff88, 0 0 10px rgba(0, 255, 136, 0.25);
+}
+
+@utility neon-text {
+  color: #00ff88;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+/* ─── CSS Classes ─────────────────────────────────────────────────────── */
+
+.glitch-text {
+  animation: glitch 5s infinite;
+}
+
+.blink-cursor::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+  color: #00ff88;
+  margin-left: 2px;
+  font-size: 0.9em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-text { animation: none; }
+  .blink-cursor::after { animation: none; }
 }
