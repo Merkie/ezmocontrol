@@ -63,6 +63,8 @@ export default function Upload({
   const [videoError, setVideoError] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
+  const [videoDragOver, setVideoDragOver] = useState(false);
+  const [imageDragOver, setImageDragOver] = useState(false);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -191,15 +193,19 @@ export default function Upload({
             Reference Video
           </label>
           <div
-            onDrop={(e) => handleDrop(e, "video")}
+            onDrop={(e) => { handleDrop(e, "video"); setVideoDragOver(false); }}
             onDragOver={(e) => e.preventDefault()}
+            onDragEnter={() => setVideoDragOver(true)}
+            onDragLeave={() => setVideoDragOver(false)}
             onClick={() => videoInputRef.current?.click()}
             className={`relative border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors min-h-[200px] ${
-              videoError
-                ? "border-red-500/50 bg-red-500/5"
-                : videoFile
-                  ? "border-green-500/50 bg-green-500/5"
-                  : "border-zinc-700 hover:border-zinc-600 bg-zinc-900/30"
+              videoDragOver
+                ? "border-blue-500 bg-blue-500/10"
+                : videoError
+                  ? "border-red-500/50 bg-red-500/5"
+                  : videoFile
+                    ? "border-green-500/50 bg-green-500/5"
+                    : "border-zinc-700 hover:border-zinc-600 bg-zinc-900/30"
             }`}
           >
             {videoPreviewUrl ? (
@@ -260,13 +266,17 @@ export default function Upload({
             Character Image
           </label>
           <div
-            onDrop={(e) => handleDrop(e, "image")}
+            onDrop={(e) => { handleDrop(e, "image"); setImageDragOver(false); }}
             onDragOver={(e) => e.preventDefault()}
+            onDragEnter={() => setImageDragOver(true)}
+            onDragLeave={() => setImageDragOver(false)}
             onClick={() => imageInputRef.current?.click()}
             className={`relative border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors min-h-[200px] ${
-              characterFile
-                ? "border-green-500/50 bg-green-500/5"
-                : "border-zinc-700 hover:border-zinc-600 bg-zinc-900/30"
+              imageDragOver
+                ? "border-blue-500 bg-blue-500/10"
+                : characterFile
+                  ? "border-green-500/50 bg-green-500/5"
+                  : "border-zinc-700 hover:border-zinc-600 bg-zinc-900/30"
             }`}
           >
             {characterPreviewUrl ? (
