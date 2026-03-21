@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { Routes, Route, useNavigate, useParams, Navigate } from "react-router-dom";
 import { Settings, Zap } from "lucide-react";
 import { useJobs } from "./hooks/useJobs";
 import { getApiKey, setApiKey } from "./lib/storage";
@@ -47,14 +48,37 @@ function ApiKeyEntry({ onSave }: { onSave: (key: string) => void }) {
   );
 }
 
+function JobPage({
+  jobs,
+  apiKey,
+  updateJob,
+}: {
+  jobs: Record<string, import("./types").Job>;
+  apiKey: string;
+  updateJob: (id: string, updates: Partial<import("./types").Job>) => void;
+}) {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const job = id ? jobs[id] : undefined;
+
+  if (!job) return <Navigate to="/" replace />;
+
+  return (
+    <ActiveJob
+      job={job}
+      apiKey={apiKey}
+      updateJob={updateJob}
+      onBack={() => navigate("/")}
+    />
+  );
+}
+
 export default function App() {
   const [apiKey, setApiKeyState] = useState("");
   const [keyLoaded, setKeyLoaded] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const { jobs, sortedJobs, createJob, updateJob, deleteJob } = useJobs();
-
-  const activeJob = activeJobId ? jobs[activeJobId] : null;
 
   useEffect(() => {
     getApiKey().then((key) => {
@@ -69,8 +93,29 @@ export default function App() {
   }, []);
 
   const handleNewJob = useCallback(() => {
-    setActiveJobId(null);
-  }, []);
+    navigate("/");
+  }, [navigate]);
+
+  const handleSelectJob = useCallback(
+    (id: string) => navigate(`/job/${id}`),
+    [navigate]
+  );
+
+  const handleJobCreated = useCallback(
+    (id: string) => navigate(`/job/${id}`),
+    [navigate]
+  );
+
+  const handleDeleteJob = useCallback(
+    (id: string) => {
+      deleteJob(id);
+      // If we're currently viewing the deleted job, go home
+      if (window.location.pathname === `/job/${id}`) {
+        navigate("/");
+      }
+    },
+    [deleteJob, navigate]
+  );
 
   if (!keyLoaded) {
     return (
@@ -127,30 +172,38 @@ export default function App() {
           <div className="flex-1 overflow-y-auto">
             <JobHistory
               jobs={sortedJobs}
-              activeJobId={activeJobId}
-              onSelect={setActiveJobId}
-              onDelete={deleteJob}
+              onSelect={handleSelectJob}
+              onDelete={handleDeleteJob}
             />
           </div>
         </aside>
 
         {/* Main area */}
         <main className="flex-1 overflow-y-auto">
-          {activeJob ? (
-            <ActiveJob
-              job={activeJob}
-              apiKey={apiKey}
-              updateJob={updateJob}
-              onBack={handleNewJob}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Upload
+                  apiKey={apiKey}
+                  createJob={createJob}
+                  updateJob={updateJob}
+                  onJobCreated={handleJobCreated}
+                />
+              }
             />
-          ) : (
-            <Upload
-              apiKey={apiKey}
-              createJob={createJob}
-              updateJob={updateJob}
-              onJobCreated={setActiveJobId}
+            <Route
+              path="/job/:id"
+              element={
+                <JobPage
+                  jobs={jobs}
+                  apiKey={apiKey}
+                  updateJob={updateJob}
+                />
+              }
             />
-          )}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useMatch } from "react-router-dom";
 import {
   CheckCircle,
   Loader2,
@@ -11,7 +12,6 @@ import type { Job, JobStatus } from "../types";
 
 interface Props {
   jobs: Job[];
-  activeJobId: string | null;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
 }
@@ -48,7 +48,9 @@ function statusLabel(status: JobStatus): string {
   }
 }
 
-export default function JobHistory({ jobs, activeJobId, onSelect, onDelete }: Props) {
+export default function JobHistory({ jobs, onSelect, onDelete }: Props) {
+  const match = useMatch("/job/:id");
+  const activeJobId = match?.params.id ?? null;
   if (jobs.length === 0) {
     return (
       <div className="p-4 text-center text-dim/50 text-sm">
