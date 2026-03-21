@@ -17,6 +17,7 @@ import * as api from "../lib/api";
 import { ConfirmModal } from "./Modal";
 import BeforeAfterSlider from "./BeforeAfterSlider";
 import ImageLightbox from "./ImageLightbox";
+import SnakeGame from "./SnakeGame";
 
 interface Props {
   job: Job;
@@ -296,6 +297,7 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
                 ))}
               </div>
             )}
+            <SnakeGame />
           </div>
         )}
 
@@ -382,6 +384,7 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
                 />
               </div>
             )}
+            <SnakeGame />
           </div>
         )}
 
