@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Upload as UploadIcon, Film, Image, X } from "lucide-react";
 import type { Job, Dimensions } from "../types";
-import { IMAGE_MODELS } from "../lib/constants";
+import { IMAGE_MODELS, IMAGE_PRICE_CENTS } from "../lib/constants";
 import * as api from "../lib/api";
 
 interface Props {
@@ -111,16 +111,21 @@ export default function Upload({
     setStartError(null);
 
     try {
-      const [frameDimensions, characterDimensions] = await Promise.all([
-        videoDimsRef.current ? Promise.resolve(videoDimsRef.current) : getVideoMetadata(videoFile).then((m) => m.dimensions),
+      const [videoMeta, characterDimensions] = await Promise.all([
+        videoDimsRef.current
+          ? getVideoMetadata(videoFile)
+          : getVideoMetadata(videoFile),
         getImageDimensions(characterFile),
       ]);
+      const frameDimensions = videoMeta.dimensions;
 
       const jobId = createJob({
         status: "uploading",
         selectedModel,
         frameDimensions,
         characterDimensions,
+        videoDuration: videoMeta.duration,
+        costCents: IMAGE_PRICE_CENTS[selectedModel] ?? 0,
       });
       onJobCreated(jobId);
 

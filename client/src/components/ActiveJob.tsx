@@ -12,7 +12,7 @@ import {
   Clock,
 } from "lucide-react";
 import type { Job } from "../types";
-import { IMAGE_MODELS, POLL_INTERVAL_IMAGE, POLL_INTERVAL_VIDEO } from "../lib/constants";
+import { IMAGE_MODELS, POLL_INTERVAL_IMAGE, POLL_INTERVAL_VIDEO, IMAGE_PRICE_CENTS, KLING_PRICE_CENTS_PER_SEC } from "../lib/constants";
 import * as api from "../lib/api";
 import { ConfirmModal } from "./Modal";
 import BeforeAfterSlider from "./BeforeAfterSlider";
@@ -124,6 +124,7 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
 
   // Regenerate image
   const handleRegenerate = useCallback(async () => {
+    const addedCost = IMAGE_PRICE_CENTS[regenModel] ?? 0;
     updateJob(job.id, {
       status: "generating_image",
       selectedModel: regenModel,
@@ -131,6 +132,7 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
       imageRequestId: undefined,
       imageEndpoint: undefined,
       error: undefined,
+      costCents: (job.costCents ?? 0) + addedCost,
     });
 
     try {
@@ -156,7 +158,12 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
 
   // Approve image and start video generation
   const handleApprove = useCallback(async () => {
-    updateJob(job.id, { status: "generating_video", error: undefined });
+    const videoCost = Math.round((job.videoDuration ?? 5) * KLING_PRICE_CENTS_PER_SEC);
+    updateJob(job.id, {
+      status: "generating_video",
+      error: undefined,
+      costCents: (job.costCents ?? 0) + videoCost,
+    });
 
     try {
       const result = await api.generateVideo(
@@ -201,10 +208,15 @@ export default function ActiveJob({ job, apiKey, updateJob, onBack }: Props) {
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <div>
+        <div className="flex-1">
           <h2 className="text-lg font-display font-semibold uppercase tracking-wide">Job</h2>
           <p className="text-[10px] text-dim font-mono tracking-wider">{job.id.slice(0, 8)}</p>
         </div>
+        <span className="text-xs text-dim font-mono tracking-wide">
+          {job.costCents != null
+            ? `$${(job.costCents / 100).toFixed(2)}`
+            : "—"}
+        </span>
       </div>
 
       {/* Step indicator */}

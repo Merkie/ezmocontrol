@@ -23,5 +23,14 @@ export const IMAGE_MODELS: ImageModel[] = [
 
 export const KLING_ENDPOINT = "fal-ai/kling-video/v3/pro/motion-control";
 
+// Pricing in cents
+export const IMAGE_PRICE_CENTS: Record<string, number> = {
+  "fal-ai/nano-banana-2/edit": 8,
+  "fal-ai/nano-banana-pro/edit": 15,
+  "fal-ai/gpt-image-1.5/edit": 13,
+};
+
+export const KLING_PRICE_CENTS_PER_SEC = 16.8;
+
 export const POLL_INTERVAL_IMAGE = 5000;
 export const POLL_INTERVAL_VIDEO = 10000;

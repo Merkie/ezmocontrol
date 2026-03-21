@@ -94,13 +94,20 @@ export default function JobHistory({ jobs, onSelect, onDelete }: Props) {
                   {statusLabel(job.status)}
                 </span>
               </div>
-              <p className="text-[10px] text-dim/50 mt-0.5 font-mono">
-                {new Date(job.createdAt).toLocaleDateString()}{" "}
-                {new Date(job.createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <p className="text-[10px] text-dim/50 font-mono">
+                  {new Date(job.createdAt).toLocaleDateString()}{" "}
+                  {new Date(job.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+                <span className="text-[10px] text-dim/40 font-mono">
+                  {job.costCents != null
+                    ? `$${(job.costCents / 100).toFixed(2)}`
+                    : "—"}
+                </span>
+              </div>
             </div>
 
             {/* Delete button */}

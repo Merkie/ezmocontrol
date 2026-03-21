@@ -22,6 +22,8 @@ export interface Job {
   frameDimensions?: Dimensions;
   characterDimensions?: Dimensions;
   selectedModel: string;
+  videoDuration?: number;
+  costCents?: number;
   imageRequestId?: string;
   imageEndpoint?: string;
   generatedImageUrl?: string;
